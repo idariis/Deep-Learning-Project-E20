@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov  9 15:17:23 2020
+from setuptools import find_packages, setup
 
-@author: elisa
-"""
-
-# Load libraries etc. here 
-# Maybe also some utility functions and load other functions
+setup(
+    name='Src',
+    packages=find_packages(),
+    version='0.1.0',
+    description='Deep learning project',
+    author='Caroline, Amalie, Ida, Elisabeth',
+    license='MIT',
+)

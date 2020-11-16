@@ -1,0 +1,16 @@
+name: deep_learning_project
+dependencies:
+    - python=3.8
+    - pytorch
+    - numpy
+    - spyder
+    - pandas
+    - matplotlib
+    - notebook
+    - scikit-learn
+    - ipywidgets
+    - tqdm
+    - pip
+    - pip:  
+        - datasets
+        - "--editable ."
