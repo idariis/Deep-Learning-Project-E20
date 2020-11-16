@@ -4,10 +4,69 @@ Created on Mon Nov 16 10:41:52 2020
 
 @author: Caroline
 """
+
+#%%
+import inspect
+src_file_path = inspect.getfile(lambda: None)
+#%% Elisabeths and Idas docs 
+
+from pathlib import Path
+from datasets import load_from_disk
+
+#path = Path(__file__).parent.parent.parent
+
+import inspect
+src_file_path = inspect.getfile(lambda: None)
+path = Path(src_file_path).parent.parent.parent
+
+dataRaw = load_from_disk(path/'Data/Raw/')
+
+def preprocess_data(data, text_length, remove_search_results):
+    """ 
+    Takes the raw data and creates paragraph dataset
+
+    
+    """
+    if remove_search_results:
+        print('Hovsa, det skal du selv goere.')
+    
+    out_data = data.map(lambda example: {'wiki_text': example['entity_pages']['wiki_context'], 
+                                             'answer': example['answer']['normalized_value']}, 
+                            remove_columns=['question_source', 'answer', 'entity_pages'])
+    out_data = out_data.filter(lambda example: len(example['wiki_text']) > 0)
+    out_data = out_data.map(lambda example: {'paragraph': get_paragraph(example)})
+    out_data = out_data.map(remove_columns = ['wiki_text'])
+    
+    return(out_data)
+
+def get_paragraph(example):
+    text_length = 128
+    n_docs = len(example['wiki_text'])
+    for i in range(n_docs):
+        idx = example['wiki_text'][i].lower().find(example['answer'])
+        if idx != -1:
+            idx_lwr = idx-text_length
+            idx_upr = idx+text_length
+            if idx_lwr < 0:
+                idx_lwr = 0
+                idx_upr = 2*text_length
+            elif idx_upr > len(example['wiki_text'][i]):
+                idx_upr = len(example['wiki_text'][i])
+                idx_lwr = idx_upr - 2*text_length
+            paragraph = example['wiki_text'][i].lower()[idx_lwr:idx_upr]
+            return(paragraph)
+    
+
+data = preprocess_data(dataRaw, 128, False)
+
+
+#%% 
 # Small test data 
 from datasets import load_from_disk
 path = 'C:/Users/Caroline/Documents/DTU/9_semester/02456_DeepLearning/deep_learning_project/Data/Processed' # Din path i stedet
 test = load_from_disk(path)
+
+smalldat = data[0:100]
 
 # BERT Fast tokenizing 
 import torch
@@ -45,5 +104,15 @@ with torch.no_grad():
     # In our case, the first element is the hidden state of the last layer of the Bert model
     encoded_layers = outputs[0]
     
+# Encoding of first text encoded_layers[0,0,:]
     
-    
+#%% Trying to find similarities with question and answers 
+
+
+
+
+
+
+
+
+
