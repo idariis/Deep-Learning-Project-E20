@@ -11,6 +11,7 @@ dependencies:
     - ipywidgets
     - tqdm
     - pip
+    - nltk
     - pip:  
         - datasets
         - "--editable ."

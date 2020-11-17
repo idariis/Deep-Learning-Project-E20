@@ -1,26 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov  9 20:28:40 2020
+Created on Tue Nov 17 21:36:50 2020
 
 @author: elisa
-
 """
-
+# Import required 
 from pathlib import Path
 from datasets import load_from_disk
 from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.tokenize import RegexpTokenizer
 import re
 import numpy as np
 
-#%%
-path = Path(__file__).parent.parent.parent
-#%%
-data = load_from_disk(path/'Data/Raw/')
-
-#%%
 def preprocess_data(data, paragraph_len = 128, remove_search_results = False):
-    """ 
-    NB jeg mangler at skrive al dokumentationen - det sker senere :)   
+    """
+    Pre-processes the data by selecting relevant columns and finding the 
+    paragraph with the correct answer .
+
+    Parameters
+    ----------
+    data : datasets.Dataset
+        The raw wiki_qa data - maybe with feature 'search_results' removed for 
+        more efficient storage.
+    paragraph_len : int, optional
+        Number of words in paragraph. The default is 128.
+    remove_search_results : bool, optional
+        Remove feature 'search_results' from the data. The default is False.
+
+    Returns
+    -------
+        datasets.dataset
+    Pre processed dataset with columns 
+    ['answer', 'paragraph', 'question', 'question_id'].
     """
    
     # Select appropiate columns
@@ -42,57 +53,53 @@ def preprocess_data(data, paragraph_len = 128, remove_search_results = False):
     return(out_data)
 
 def get_paragraph_with_answer(example, paragraph_len):
+    """
+    Return paragraph of paragraph_len from example['wiki_text'] with highest 
+    similary to question + answer
+    """
     paragraphs = get_all_paragraphs(example, paragraph_len)
-    target = example['question'] + example['answer']
+    target = example['question'] + example['answer'] 
     sim = get_tfidf_similarity([target], paragraphs)
     idx_answer_paragraph = np.argmax(sim)
     answer_paragraph = paragraphs[idx_answer_paragraph]
     return answer_paragraph
 
+
 def get_all_paragraphs(example, paragraph_len):
     """
-    Later: implement sliding window?
+    Splits all wiki_texts of example into paragraphs of paragraph_len
     """
     n_texts = len(example['wiki_text'])
     all_paragraphs = []
+    tokenizer = RegexpTokenizer(r'\w+')
     for i in range(n_texts):
-        text_lower = example['wiki_text'][i].lower()
-        text_no_space = re.sub(r'[\t\n\r]', ' ', text_lower)
-        text_no_space = re.sub(r'[  ]', ' ', text_no_space)
-        words = re.sub(r'[^\w ]', '', text_no_space).split(' ')
-        words = [word for word in words if word]
-        paragraphs = [words[i:(i+paragraph_len)] for i in range(0, len(words), paragraph_len)]
-        paragraphs = [example['wiki_title'][i].lower() + ' ' + ' '.join(paragraph) for paragraph in paragraphs]
+        tokens = tokenizer.tokenize(example['wiki_text'][i].lower())
+        paragraphs = [tokens[i:(i+paragraph_len)] \
+                      for i in range(0, len(tokens), paragraph_len)]
+        paragraphs = [example['wiki_title'][i].lower() + \
+                      ' ' + ' '.join(paragraph) for paragraph in paragraphs]
         all_paragraphs += paragraphs 
     return all_paragraphs
     
     
 def get_tfidf_similarity(questions, paragraphs):
+    """
+    Returns a similarity matrix based on the distance in the tf-idf space
+
+    Parameters
+    ----------
+    questions : list of strings
+        Lists of all questions.
+    paragraphs : list of strings
+        Lists of all paragraphs
+    
+    Returns :
+    -------
+        Similarity matrix of dimension  
+        (number of questions, number of paragraphs). 
+    """
     vectorizer = TfidfVectorizer(lowercase = False)
     all_text = questions + paragraphs
     vectorizer.fit(all_text)
     similarity = vectorizer.transform(questions) * vectorizer.transform(paragraphs).T
     return similarity.todense()
-
-
-# This one is not quite done. Used simpler version instead
-def get_top_k(similarity, paragraphs, k):
-    idxs = np.argpartition(similarity, -k)[:, -k:].tolist()
-    top_k_paragraphs = [[paragraphs[idx] for idx in question_idxs] for question_idxs in idxs]
-    return top_k_paragraphs
-
-def find_best_paragraph_with_answer(top_k_paragraphs, answer):
-    k = len(top_k_paragraphs)
-    for i in range(k):
-        tmp = top_k_paragraphs[i].find(answer)
-        if tmp != -1:
-            return top_k_paragraphs[i]
-    return top_k_paragraphs[0]
-
-#%%
-data_preprocessed = preprocess_data(data, 128, False)
-
-#%% Quick look at pre-processed data
-print(data_preprocessed.features)
-#%%
-
