@@ -6,6 +6,23 @@ Created on Mon Nov 16 10:41:52 2020
 """
 
 #%%
+from Src.Data.preprocessing_function import *
+import inspect
+
+#%%
+src_file_path = inspect.getfile(lambda: None)
+path = Path(src_file_path).parent.parent.parent
+
+data = load_from_disk(path/'Data/Raw/')
+
+#%% Usage:
+data_preprocessed = preprocess_data(data, 128, False)
+
+#%% Quick look at pre-processed data
+print(data_preprocessed.features)
+
+
+#%%
 import inspect
 src_file_path = inspect.getfile(lambda: None)
 #%% Elisabeths and Idas docs 
@@ -107,6 +124,7 @@ with torch.no_grad():
 # Encoding of first text encoded_layers[0,0,:]
     
 #%% Trying to find similarities with question and answers 
+
 
 
 

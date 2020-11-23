@@ -10,9 +10,11 @@ BERT or tf-idf.
 """
 
 from Src.Data.preprocessing_function import *
+import inspect
 
 #%%
-path = Path(__file__).parent.parent.parent
+src_file_path = inspect.getfile(lambda: None)
+path = Path(src_file_path).parent.parent.parent
 #%%
 data = load_from_disk(path/'Data/Raw/')
 
