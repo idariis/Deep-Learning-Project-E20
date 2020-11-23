@@ -102,4 +102,4 @@ def get_tfidf_similarity(questions, paragraphs):
     all_text = questions + paragraphs
     vectorizer.fit(all_text)
     similarity = vectorizer.transform(questions) * vectorizer.transform(paragraphs).T
-    return similarity.todense()
+    return np.array(similarity.todense())

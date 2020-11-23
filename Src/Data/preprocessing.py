@@ -23,14 +23,7 @@ data = load_from_disk(path/'Data/Raw/')
 
 
 # Work in progress below, might be useful later
-#def get_top_k(similarity, paragraphs, k):
-#    """ 
-#    Get the top k paragraphs with highest similary with question + answer
-#    Currently does
-#    """
-#    idxs = np.argpartition(similarity, -k)[:, -k:].tolist()
-#    top_k_paragraphs = [[paragraphs[idx] for idx in question_idxs] for question_idxs in idxs]
-#    return top_k_paragraphs
+
 
 #def find_best_paragraph_with_answer(top_k_paragraphs, answer):
 #    k = len(top_k_paragraphs)
