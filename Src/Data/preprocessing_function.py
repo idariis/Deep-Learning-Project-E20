@@ -4,12 +4,9 @@ Created on Tue Nov 17 21:36:50 2020
 
 @author: elisa
 """
-# Import required 
-from pathlib import Path
-from datasets import load_from_disk
-from sklearn.feature_extraction.text import TfidfVectorizer
+# Imports required to run functions
 from nltk.tokenize import RegexpTokenizer
-import re
+from Src.Models.DPR_functions import get_tfidf_similarity
 import numpy as np
 
 def preprocess_data(data, paragraph_len = 128, remove_search_results = False):
@@ -82,24 +79,3 @@ def get_all_paragraphs(example, paragraph_len):
     return all_paragraphs
     
     
-def get_tfidf_similarity(questions, paragraphs):
-    """
-    Returns a similarity matrix based on the distance in the tf-idf space
-
-    Parameters
-    ----------
-    questions : list of strings
-        Lists of all questions.
-    paragraphs : list of strings
-        Lists of all paragraphs
-    
-    Returns :
-    -------
-        Similarity matrix of dimension  
-        (number of questions, number of paragraphs). 
-    """
-    vectorizer = TfidfVectorizer(lowercase = False)
-    all_text = questions + paragraphs
-    vectorizer.fit(all_text)
-    similarity = vectorizer.transform(questions) * vectorizer.transform(paragraphs).T
-    return np.array(similarity.todense())
