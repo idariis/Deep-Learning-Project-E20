@@ -7,11 +7,13 @@ Created on Mon Nov 23 20:41:54 2020
 from datasets import load_from_disk
 from pathlib import Path
 from inspect import getfile
+import matplotlib.pyplot as plt
+from random import sample
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 from Src.Data.preprocessing_function import preprocess_data
 import Src.Models.DPR_functions as DPR
-#from Src.Models.DPR_functions import get_tfidf_similarity, get_top_k,\
-#    get_accuracy, get_BERT_similarity
 
 src_file_path = getfile(lambda: None)
 deep_learning_dir = Path(src_file_path).parent.parent.parent
@@ -21,7 +23,7 @@ data = load_from_disk(deep_learning_dir/'Data/Raw/')
 data_preprocessed = preprocess_data(data)
 
 #%% Define inputs
-k = 5
+k = 10
 n = 100
 
 questions = data_preprocessed['question'][0:n]
@@ -29,16 +31,62 @@ question_ids = data_preprocessed['question_id'][0:n]
 paragraphs = data_preprocessed['paragraph'][0:n]
 
 
-#%% Get tfidf results
+#%% Get similarity matrices
 tfidf_sim = DPR.get_tfidf_similarity(questions, paragraphs)
-top_k = DPR.get_top_k(tfidf_sim, question_ids, question_ids, k)
-acc_tfidf = DPR.get_accuracy(top_k)
-print(f'Accuracy of tfidf: {acc_tfidf}')
-
-#%% Get BERT results
 sim_BERT = DPR.get_BERT_similarity(questions, paragraphs)
-top_k_BERT = DPR.get_top_k(sim_BERT.numpy(), question_ids, question_ids, k)
-acc_BERT = DPR.get_accuracy(top_k_BERT)
-print(f'Accuracy of BERT (no training): {acc_BERT}')
+#%%
+sim_BERT_normalized = StandardScaler().fit_transform(sim_BERT)
+
+
+#%% Generating plots
+
+
+
+#%% 
+def get_accuracy_vector(k_list, sim, question_ids, paragraph_ids):
+    accs = [None]*len(k_list)
+    for i, k in enumerate(k_list):
+        top_k = DPR.get_top_k(sim, question_ids, paragraph_ids, k)
+        accs[i] = DPR.get_accuracy(top_k)
+    return accs
+    
+#%%
+def get_random_accuracy(k_list, n):
+    max_k = max(k_list)
+    top_k_list = [sample(range(n), max_k) for i in range(n)] # 
+    accs = [None]*len(k_list)
+    for i, k in enumerate(k_list): 
+        n_correct = [(1 in top_k[0:k]) for top_k in top_k_list]
+        accs[i] = sum(n_correct)/n*100
+    return(accs)
+
+#%% Get accuracies for a range of ks
+k_list = [i+1 for i in range(int(n/4))]
+acc_tfidf = get_accuracy_vector(k_list, tfidf_sim, question_ids, question_ids)
+acc_bert = get_accuracy_vector(k_list, sim_BERT, question_ids, question_ids)
+acc_bert_normalized = get_accuracy_vector(k_list, sim_BERT_normalized, question_ids, question_ids)
+acc_random = get_random_accuracy(k_list, n)
+
+#%%
+plt.plot(k_list, acc_tfidf, label = 'TF-IDF')
+plt.plot(k_list, acc_bert, label = 'BERT INIT')
+plt.plot(k_list, acc_random, label = 'RANDOM')
+plt.plot(k_list, acc_bert_normalized, label = 'BERT INIT NORMALIZED')
+plt.legend()
+plt.xlabel('k')
+plt.ylabel('Accuracy')
+plt.show()
+
+#%%
+plt.matshow(sim_BERT)
+plt.title('BERT similarity matrix')
+plt.matshow(tfidf_sim)
+plt.title('TF-IDF similarity matrix')
+plt.matshow(sim_BERT_normalized)
+plt.title('BERT similarity matrix - normalized')
+
+
+
+
 
 
