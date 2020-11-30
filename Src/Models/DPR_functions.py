@@ -87,7 +87,7 @@ def get_BERT_similarity(questions, paragraphs):
     E_Q = encoder_BERT(tokenize_BERT(questions))
     E_P = encoder_BERT(tokenize_BERT(paragraphs))
     sim = torch.matmul(E_Q, E_P.T)
-    return sim
+    return sim.numpy()
 
 
 def tokenize_BERT(text):
@@ -109,6 +109,3 @@ def encoder_BERT(tokenized_text):
     
     return encoded_layers[:, 0, :]
 
-def get_random_accuracy(k, n):
-    # Still neds to be implemented
-    pass
