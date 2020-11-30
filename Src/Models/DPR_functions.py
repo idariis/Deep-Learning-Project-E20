@@ -7,6 +7,7 @@ Created on Mon Nov 23 20:19:26 2020
 
 # Imports required to run functions
 import numpy as np
+from random import sample
 from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
 from transformers import BertTokenizerFast, BertModel
@@ -108,4 +109,20 @@ def encoder_BERT(tokenized_text):
         encoded_layers = outputs[0]
     
     return encoded_layers[:, 0, :]
+
+def get_random_accuracy(k_list, n):
+    max_k = max(k_list)
+    top_k_list = [sample(range(n), max_k) for i in range(n)] # 
+    accs = [None]*len(k_list)
+    for i, k in enumerate(k_list): 
+        n_correct = [(1 in top_k[0:k]) for top_k in top_k_list]
+        accs[i] = sum(n_correct)/n*100
+    return(accs)
+
+def get_accuracy_vector(k_list, sim, question_ids, paragraph_ids):
+    accs = [None]*len(k_list)
+    for i, k in enumerate(k_list):
+        top_k = get_top_k(sim, question_ids, paragraph_ids, k)
+        accs[i] = get_accuracy(top_k)
+    return accs
 
