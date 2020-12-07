@@ -55,10 +55,25 @@ def get_paragraph_with_answer(example, paragraph_len):
     similary to question + answer
     """
     paragraphs = get_all_paragraphs(example, paragraph_len)
+    
+    # joining title and text
+    paragraphs_joined = [paragraph[0] + ' ' + paragraph[1] for paragraph in paragraphs]
+    
+    # similarities
     target = example['question'] + example['answer'] 
-    sim = get_tfidf_similarity([target], paragraphs)
-    idx_answer_paragraph = np.argmax(sim)
-    answer_paragraph = paragraphs[idx_answer_paragraph]
+    sim = get_tfidf_similarity([target], paragraphs_joined) 
+        
+    # finding most similar containing the answer
+    n_para = sim.size
+    
+    idxs = np.argsort(sim)[0][-n_para:]
+    for p in range(len(idxs)):
+        idx = idxs[-p]
+        if example['answer'] in paragraphs[idx][1]:
+            break 
+    
+    answer_paragraph = paragraphs[idx]
+    
     return answer_paragraph
 
 
@@ -73,8 +88,14 @@ def get_all_paragraphs(example, paragraph_len):
         tokens = tokenizer.tokenize(example['wiki_text'][i].lower())
         paragraphs = [tokens[i:(i+paragraph_len)] \
                       for i in range(0, len(tokens), paragraph_len)]
-        paragraphs = [example['wiki_title'][i].lower() + \
-                      ' ' + ' '.join(paragraph) for paragraph in paragraphs]
+        
+        #Old paragraph for concatenating title with paragraph
+        #paragraphs = [example['wiki_title'][i].lower() + \
+        #              ' ' + ' '.join(paragraph) for paragraph in paragraphs]
+        
+        # Paragraph as list of title and text 
+        paragraphs = [[example['wiki_title'][i].lower()] + [' '.join(paragraph)] for paragraph in paragraphs]
+        
         all_paragraphs += paragraphs 
     return all_paragraphs
     

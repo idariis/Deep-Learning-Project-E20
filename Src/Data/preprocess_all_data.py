@@ -10,7 +10,7 @@ from datasets import load_dataset
 from pathlib import Path
 from inspect import getfile
 
-from Src.Data.preprocessing_function import preprocess_data
+from Src.Data.preprocess_3 import preprocess_data
 
 src_file_path = getfile(lambda: None)
 deep_learning_dir = Path(src_file_path).parent.parent.parent
