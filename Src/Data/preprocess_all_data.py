@@ -16,21 +16,24 @@ src_file_path = getfile(lambda: None)
 deep_learning_dir = Path(src_file_path).parent.parent.parent
 
 #%% Load data
-train_data = load_dataset('trivia_qa', name = 'rc', split = 'train')
+#train_data = load_dataset('trivia_qa', name = 'rc', split = 'train')
 validation_data = load_dataset('trivia_qa', name = 'rc', split = 'validation')
 
-train_all = train_data.map(remove_columns=(['search_results']))
+#train_data = train_data.select(range(3000))
+validation_data = validation_data.select(range(3000))
+
+#train_all = train_data.map(remove_columns=(['search_results']))
 validation_all = validation_data.map(remove_columns=(['search_results']))
 
 #%% Preprocess data
-train_preprocessed = preprocess_data(train_all)
+#train_preprocessed = preprocess_data(train_all)
 validation_preprocessed = preprocess_data(validation_all)
 
 #%% Save data
-train_preprocessed.save_to_disk(deep_learning_dir/'Data/Raw/train_all/')
-validation_preprocessed.save_to_disk(deep_learning_dir/'Data/Raw/validation_all/')
+#train_preprocessed.save_to_disk(deep_learning_dir/'Data/Raw/train_small/')
+validation_preprocessed.save_to_disk(deep_learning_dir/'Data/Raw/validation_small/')
 
 #%%
 from datasets import load_from_disk
 
-test = load_from_disk(deep_learning_dir/'Data/Raw/train_all/')
+test = load_from_disk(deep_learning_dir/'Data/Raw/validation_small/')
