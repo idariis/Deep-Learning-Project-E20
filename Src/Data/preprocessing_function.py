@@ -47,6 +47,9 @@ def preprocess_data(data, paragraph_len = 128, remove_search_results = False):
         'paragraph': get_paragraph_with_answer(example, paragraph_len)
         }, remove_columns = ['wiki_text', 'wiki_title'])
     
+    out_data = out_data.map(lambda example: {
+        'question': append_Q_token(example)
+        })
     return(out_data)
 
 def get_paragraph_with_answer(example, paragraph_len):
@@ -56,8 +59,8 @@ def get_paragraph_with_answer(example, paragraph_len):
     """
     paragraphs = get_all_paragraphs(example, paragraph_len)
     
-    # joining title and text
-    paragraphs_joined = [paragraph[0] + ' ' + paragraph[1] for paragraph in paragraphs]
+    # joining title and text without the '[P]' token 
+    paragraphs_joined = [paragraphs[0][0][4:] + ' ' + paragraph[1] for paragraph in paragraphs]
     
     # similarities
     target = example['question'] + example['answer'] 
@@ -94,9 +97,18 @@ def get_all_paragraphs(example, paragraph_len):
         #              ' ' + ' '.join(paragraph) for paragraph in paragraphs]
         
         # Paragraph as list of title and text 
-        paragraphs = [[example['wiki_title'][i].lower()] + [' '.join(paragraph)] for paragraph in paragraphs]
+        paragraphs = [['[P] ' + example['wiki_title'][i].lower()] + [' '.join(paragraph)] for paragraph in paragraphs]
         
         all_paragraphs += paragraphs 
     return all_paragraphs
     
+    
+def append_Q_token(example):
+    """
+    Appends P or Q to the paragraph or Question
+    """
+    return(['[Q]'] + [example['question']])
+   
+    
+
     
