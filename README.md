@@ -8,9 +8,11 @@ The [Src](https://github.com/elisabethzinck/deep_learning_project/tree/master/Sr
 
 * The [Data](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Data)-folder in which data is loaded and preprocessed.
 * The [Models](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Models)-folder in which all the models that have been developed, can be found.
-* The [Visualization](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Visualization)-folder in which scripts that evaluate the performance can be found. Furthermore, the file [predictions_masked.py](https://github.com/elisabethzinck/deep_learning_project/blob/master/Src/Visualization/predictions_masked.py) that contains experiments with predicting masked words, can be found.
+* The [Visualization](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Visualization)-folder in which scripts that evaluate the performance can be found. Furthermore, the folder contains the file [predictions_masked.py](https://github.com/elisabethzinck/deep_learning_project/blob/master/Src/Visualization/predictions_masked.py) in which experiments with predicting masked words can be found.
 
-## Usage 
+## Usage
+
+In this section, the overall usage of the project is illustrated by showing some of the code snippets from [Presentation of Main Results.ipynb](https://github.com/elisabethzinck/deep_learning_project/blob/master/Presentation%20of%20Main%20Results.ipynb). For more details, please follow the link.
 
 ### Importing Modules
 
