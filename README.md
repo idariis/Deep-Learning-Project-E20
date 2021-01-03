@@ -114,28 +114,28 @@ Out[]:
         'filename': ['England.txt', 'Judi_Dench.txt'],
         'title': ['England', 'Judi Dench'],
         'wiki_context': ['England is a country that is part of the United Kingdom.   It shares 
-        land borders with Scotland to the north and Wales to the west. The Irish Sea lies 
-        northwest of England and the Celtic Sea lies to the southwest. England is separated 
-        from continental Europe by the North Sea to the east and the English Channel to the 
-        south. The country covers much of the central and southern part of the island of Great 
-        Britain, which lies in the North Atlantic; and includes over 100 smaller islands such 
-        as the Isles of Scilly, and the Isle of Wight.\n\nThe area now called England was first 
-        inhabited by modern humans during the Upper Palaeolithic period, but takes its name from 
-        the Angles, one of the Germanic tribes who settled during the 5th and 6th centuries. 
-        England became a unified state in the 10th century, and since the Age of Discovery, which 
-        began during the 15th century, has had a significant cultural and legal impact on the 
-        wider world.  The English language, the Anglican Church, and English law – the basis for 
-        the common law legal systems of many other countries around the world – developed in 
-        England, and the country\'s parliamentary system of government has been widely adopted by 
-        other nations.  The Industrial Revolution began in 18th-century England, transforming its 
-        society into the world\'s first industrialised nation. \n\nEngland\'s terrain mostly 
-        comprises low hills and plains, especially in central and southern England. However, 
-        there are uplands in the north (for example, the mountainous Lake District, Pennines, 
-        and Yorkshire Dales) and in the south west (for example, Dartmoor and the Cotswolds). 
-        The capital is London, which is the largest metropolitan area in both the United Kingdom 
-        and the European Union.According to the European Statistical Agency, London is the largest 
-        Larger Urban Zone in the EU, a measure of metropolitan area which comprises a city\'s 
-        urban core as well as ...']},
+        'land borders with Scotland to the north and Wales to the west. The Irish Sea lies' 
+        'northwest of England and the Celtic Sea lies to the southwest. England is separated' 
+        'from continental Europe by the North Sea to the east and the English Channel to the' 
+        'south. The country covers much of the central and southern part of the island of Great' 
+        'Britain, which lies in the North Atlantic; and includes over 100 smaller islands such' 
+        'as the Isles of Scilly, and the Isle of Wight.\n\nThe area now called England was first' 
+        'inhabited by modern humans during the Upper Palaeolithic period, but takes its name from' 
+        'the Angles, one of the Germanic tribes who settled during the 5th and 6th centuries.' 
+        'England became a unified state in the 10th century, and since the Age of Discovery, which' 
+        'began during the 15th century, has had a significant cultural and legal impact on the' 
+        'wider world.  The English language, the Anglican Church, and English law – the basis for' 
+        'the common law legal systems of many other countries around the world – developed in' 
+        'England, and the country\'s parliamentary system of government has been widely adopted by' 
+        'other nations.  The Industrial Revolution began in 18th-century England, transforming its' 
+        'society into the world\'s first industrialised nation. \n\nEngland\'s terrain mostly' 
+        'comprises low hills and plains, especially in central and southern England. However,' 
+        'there are uplands in the north (for example, the mountainous Lake District, Pennines,' 
+        'and Yorkshire Dales) and in the south west (for example, Dartmoor and the Cotswolds).' 
+        'The capital is London, which is the largest metropolitan area in both the United Kingdom' 
+        'and the European Union.According to the European Statistical Agency, London is the largest' 
+        'Larger Urban Zone in the EU, a measure of metropolitan area which comprises a city\'s' 
+        'urban core as well as ...']},
         'question': 'Where in England was Dame Judi Dench born?',
         'question_id': 'tc_3',
         'question_source': 'http://www.triviacountry.com/'}
@@ -166,14 +166,6 @@ n_batches_train = ceil(n_sample_train/batch_size)
 # Validation
 n_sample_validation = 128 
 n_batches_validation = ceil(n_sample_validation/batch_size)
-
-
-# Define model parameters
-lr = 5e-5
-n_epochs = 4
-
-# Define printing parameters
-n_batch_print = 16 # Prints every (n_batch_print) during training
 
 # Subset data
 train_data = train_processed.select(range(n_sample_train))
@@ -216,7 +208,8 @@ model = BertModel.from_pretrained('bert-base-uncased')
 # Move model to cuda to train there
 model.to(device)
 
-optim = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr = lr) # filter object works as a generator 
+optim = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr = lr) 
+# filter object works as a generator 
 ```
 
 The model can now be passed into a training loop, see [Presentation of Main Results.ipynb](https://github.com/elisabethzinck/deep_learning_project/blob/master/Presentation%20of%20Main%20Results.ipynb) for more details.
@@ -229,7 +222,7 @@ model.save_pretrained(model_path)
 
 ### Evaluate Performance
 
-Validation data is introduced.
+Validation data is now used in order to evaluate performance.
 
 ```python
 
