@@ -1,6 +1,6 @@
 # Open Domain Question Answering - Deep Learning Project
 
-> This repository contains our exam project in the course 02456 Deep Learning E20 at DTU.
+> This repository contains our exam project in the course 02456 Deep Learning Fall 2020 at DTU. **Note that the notebook containing the main results can be found in [Presentation of Main Results.ipynb](https://github.com/elisabethzinck/deep_learning_project/blob/master/Presentation%20of%20Main%20Results.ipynb).** 
 
 ## Structure
 
