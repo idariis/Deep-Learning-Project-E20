@@ -219,143 +219,7 @@ model.to(device)
 optim = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr = lr) # filter object works as a generator 
 ```
 
-```python
-# The big loop :D 
-epoch_train_loss = [None]*n_batches_train
-epoch_validation_loss = [None]*n_batches_validation
-train_loss = [None]*n_epochs
-validation_loss = [None]*n_epochs
-
-
-for epoch in range(n_epochs):
-    
-    print(f'### EPOCH: {epoch+1}/{n_epochs} ###')
-
-    trainloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size)
-    trainloader = iter(trainloader)
-    validationloader = torch.utils.data.DataLoader(validation_data, batch_size=batch_size)
-    validationloader = iter(validationloader)
-    
-    # TRAINING MODEL
-    model.train()
-    for i, batch in enumerate(trainloader):
-        if i % n_batch_print == 0:
-          print(f'batch {i+1}/{len(trainloader)}')
-        
-        model.zero_grad()
-
-        # Make forward pass for paragraphs
-        input_ids = batch['P_input_ids'].to(device)
-        attention_mask = batch['P_attention_mask'].to(device)
-        token_type_ids = batch['P_token_type_ids'].to(device)
-        P_encoded_layers = model(input_ids=input_ids, 
-                          attention_mask=attention_mask, 
-                          token_type_ids=token_type_ids, output_hidden_states = True)#[0][:, 0, :]
-        # concatenating hidden layers
-        P_cat = torch.cat(tuple([P_encoded_layers.hidden_states[i] for i in [-3, -2, -1]]), dim=-1)  
-        P_cat = P_cat[:, 0, :]
-        
-        # Make forward pass for questions
-        input_ids = batch['Q_input_ids'].to(device)
-        attention_mask = batch['Q_attention_mask'].to(device)
-        token_type_ids = batch['Q_token_type_ids'].to(device)
-        Q_encoded_layers = model(input_ids=input_ids, 
-                          attention_mask=attention_mask, 
-                          token_type_ids=token_type_ids, output_hidden_states = True)#[0][:, 0, :]
-        # concatenating hidden layers
-        Q_cat = torch.cat(tuple([Q_encoded_layers.hidden_states[i] for i in [-3, -2, -1]]), dim=-1)  
-        Q_cat = Q_cat[:, 0, :]
-
-        # Calculate similarity matrix
-        sim_matrix = torch.matmul(Q_cat, P_cat.T)
-
-        # Get loss
-        loss = get_loss(sim_matrix)
-        #loss.requires_grad = True
-
-        # Update weights
-        loss.backward()
-        optim.step()
-
-        # Save loss
-        epoch_train_loss[i] = loss.item()
-
-    # VALIDATING MODEL
-    model.eval()
-    for i, batch in enumerate(validationloader):
-        
-        # (get extra observation in training set)
-
-        # Make forward pass for paragraphs
-        input_ids = batch['P_input_ids'].to(device)
-        attention_mask = batch['P_attention_mask'].to(device)
-        token_type_ids = batch['P_token_type_ids'].to(device)
-        P_encoded_layers = model(input_ids=input_ids, 
-                          attention_mask=attention_mask, 
-                          token_type_ids=token_type_ids, output_hidden_states = True)
-        
-        # concatenating hidden layers
-        P_cat = torch.cat(tuple([P_encoded_layers.hidden_states[i] for i in [-3, -2, -1]]), dim=-1)  
-        P_cat = P_cat[:, 0, :]
-
-        # Make forward pass for questions
-        input_ids = batch['Q_input_ids'].to(device)
-        attention_mask = batch['Q_attention_mask'].to(device)
-        token_type_ids = batch['Q_token_type_ids'].to(device)
-        Q_encoded_layers = model(input_ids=input_ids, 
-                          attention_mask=attention_mask, 
-                          token_type_ids=token_type_ids, output_hidden_states = True)
-        
-        # concatenating hidden layers
-        Q_cat = torch.cat(tuple([Q_encoded_layers.hidden_states[i] for i in [-3, -2, -1]]), dim=-1)  
-        Q_cat = Q_cat[:, 0, :]
-
-        # Calculate similarity matrix
-        sim_matrix = torch.matmul(Q_cat, P_cat.T)
-
-        # Get loss
-        loss = get_loss(sim_matrix)
-        epoch_validation_loss[i] = loss.item()
-        
-    
-    train_loss[epoch] = sum(epoch_train_loss)/len(epoch_train_loss)
-    validation_loss[epoch] = sum(epoch_validation_loss)/len(epoch_validation_loss)
-    
-    print(f'train loss: {train_loss[epoch]:.2f}')
-    print(f'validation loss: {validation_loss[epoch]:.2f}')
-```
-
-```python
-Out[]:
-        ### EPOCH: 1/4 ###
-        batch 1/64
-        batch 17/64
-        batch 33/64
-        batch 49/64
-        train loss: 409.36
-        validation loss: 45.81
-        ### EPOCH: 2/4 ###
-        batch 1/64
-        batch 17/64
-        batch 33/64
-        batch 49/64
-        train loss: 84.02
-        validation loss: 16.92
-        ### EPOCH: 3/4 ###
-        batch 1/64
-        batch 17/64
-        batch 33/64
-        batch 49/64
-        train loss: 37.52
-        validation loss: 8.96
-        ### EPOCH: 4/4 ###
-        batch 1/64
-        batch 17/64
-        batch 33/64
-        batch 49/64
-        train loss: 23.78
-        validation loss: 9.21
-```
+The model can now be passed into a training loop, see [Presentation of Main Results.ipynb](https://github.com/elisabethzinck/deep_learning_project/blob/master/Presentation%20of%20Main%20Results.ipynb) for more details.
 
 ```python
 #%% Saving model
@@ -364,6 +228,8 @@ model.save_pretrained(model_path)
 ```
 
 ### Evaluate Performance
+
+Validation data is introduced.
 
 ```python
 
@@ -399,27 +265,6 @@ acc_tfidf = get_accuracy_vector(k_list, sim_tfidf, question_ids, question_ids)
 acc_bert = get_accuracy_vector(k_list, sim_BERT, question_ids, question_ids)
 acc_bert_finedtuned = get_accuracy_vector(k_list, sim_BERT_finetuned, question_ids, question_ids)
 acc_random = get_random_accuracy(k_list, n_evaluation)
-```
-
-```python
-import pandas as pd
-all_accuracies = pd.DataFrame(list(zip(k_list, acc_random, acc_tfidf, acc_bert, acc_bert_finedtuned)), 
-                              columns = ['k', 'random', 'tfidf', 'no_finetune', 'finetuned_9thTo11th'])
-report_df = all_accuracies.copy()
-report_df = report_df[report_df.k.isin([5,20,100])]
-report_df = report_df.set_index('k')
-report_df = report_df[['random', 'tfidf', 'no_finetune', 'finetuned_9thTo11th',]]
-report_df = report_df.transpose()
-report_df
-```
-
-```python
-Out[]:
-        k 	    5 	        20 	        100
-        random 	0.097656 	1.074219 	9.082031
-        tfidf 	48.383838 	62.121212 	74.949495
-        no_finetune 	3.838384 	10.000000 	25.353535
-        finetuned_9thTo11th 	80.202020 	90.101010 	97.272727
 ```
 
 ## API
