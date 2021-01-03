@@ -4,11 +4,11 @@
 
 ## Structure
 
-The `src`-folder contains three folders:
+The [Src](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src)-folder contains three folders:
 
-* The `Data`-folder in which ...
-* The `Models`-folder in which ...
-* The `Visualization`-folder in which ...
+* The [Data](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Data)-folder in which data is loaded and preprocessed.
+* The [Models](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Models)-folder in which all the models that have been developed, can be found.
+* The [Visualization](https://github.com/elisabethzinck/deep_learning_project/tree/master/Src/Visualization)-folder in which scripts that evaluate the performance can be found. Furthermore, the file [predictions_masked.py](https://github.com/elisabethzinck/deep_learning_project/blob/master/Src/Visualization/predictions_masked.py) that contains experiments with predicting masked words, can be found.
 
 ## Usage 
 
