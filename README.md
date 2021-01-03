@@ -136,7 +136,7 @@ Out[]:
         and Yorkshire Dales) and in the south west (for example, Dartmoor and the Cotswolds).
         The capital is London, which is the largest metropolitan area in both the United Kingdom 
         and the European Union.According to the European Statistical Agency, London is the largest 
-        Larger Urban Zone in the EU, a measure of metropolitan area which comprises a city\'s' 
+        Larger Urban Zone in the EU, a measure of metropolitan area which comprises a city\'s 
         urban core as well as ...']},
         'question': 'Where in England was Dame Judi Dench born?',
         'question_id': 'tc_3',
